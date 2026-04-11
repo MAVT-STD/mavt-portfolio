@@ -8,11 +8,8 @@
 <style>
   :root {
     --bg: #040d1a;
-    --bg2: #070f20;
-    --blue: #1a3a6b;
     --blue-mid: #1e4080;
     --purple: #6b2fa0;
-    --purple-light: #8b44c4;
     --accent: #5b8dee;
     --accent2: #a855f7;
     --text: #e8eaf0;
@@ -22,331 +19,62 @@
   }
 
   * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-serif; min-height: 100vh; overflow-x: hidden; }
 
-  body {
-    background: var(--bg);
-    color: var(--text);
-    font-family: 'DM Sans', sans-serif;
-    min-height: 100vh;
-    overflow-x: hidden;
-  }
-
-  /* Background */
   .bg-mesh {
-    position: fixed;
-    inset: 0;
-    z-index: 0;
+    position: fixed; inset: 0; z-index: 0;
     background:
       radial-gradient(ellipse 80% 60% at 10% 20%, rgba(26,58,107,0.5) 0%, transparent 60%),
       radial-gradient(ellipse 60% 50% at 90% 80%, rgba(107,47,160,0.4) 0%, transparent 60%),
       radial-gradient(ellipse 40% 40% at 50% 50%, rgba(30,64,128,0.2) 0%, transparent 70%);
     pointer-events: none;
   }
-
   .noise {
-    position: fixed;
-    inset: 0;
-    z-index: 0;
-    opacity: 0.03;
+    position: fixed; inset: 0; z-index: 0; opacity: 0.03;
     background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
     pointer-events: none;
   }
 
-  /* Layout */
-  .container {
-    position: relative;
-    z-index: 1;
-    max-width: 900px;
-    margin: 0 auto;
-    padding: 60px 24px 80px;
-  }
+  .container { position: relative; z-index: 1; max-width: 900px; margin: 0 auto; padding: 60px 24px 80px; }
 
-  /* Header */
-  header {
-    text-align: center;
-    margin-bottom: 70px;
-    animation: fadeUp 0.8s ease both;
-  }
+  header { text-align: center; margin-bottom: 70px; animation: fadeUp 0.8s ease both; }
+  .logo { display: inline-block; font-family: 'Syne', sans-serif; font-weight: 800; font-size: 13px; letter-spacing: 6px; text-transform: uppercase; color: var(--muted); margin-bottom: 20px; padding: 8px 20px; border: 1px solid var(--border); border-radius: 100px; }
+  h1 { font-family: 'Syne', sans-serif; font-weight: 800; font-size: clamp(42px, 8vw, 72px); line-height: 1; letter-spacing: -2px; background: linear-gradient(135deg, #e8eaf0 30%, var(--accent) 70%, var(--accent2) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; margin-bottom: 16px; }
+  .tagline { color: var(--muted); font-size: 15px; font-weight: 300; letter-spacing: 0.5px; }
 
-  .logo {
-    display: inline-block;
-    font-family: 'Syne', sans-serif;
-    font-weight: 800;
-    font-size: 13px;
-    letter-spacing: 6px;
-    text-transform: uppercase;
-    color: var(--muted);
-    margin-bottom: 20px;
-    padding: 8px 20px;
-    border: 1px solid var(--border);
-    border-radius: 100px;
-  }
+  .section-label { font-family: 'Syne', sans-serif; font-size: 11px; font-weight: 700; letter-spacing: 4px; text-transform: uppercase; color: var(--muted); margin-bottom: 24px; display: flex; align-items: center; gap: 12px; }
+  .section-label::after { content: ''; flex: 1; height: 1px; background: var(--border); }
 
-  h1 {
-    font-family: 'Syne', sans-serif;
-    font-weight: 800;
-    font-size: clamp(42px, 8vw, 72px);
-    line-height: 1;
-    letter-spacing: -2px;
-    background: linear-gradient(135deg, #e8eaf0 30%, var(--accent) 70%, var(--accent2) 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    margin-bottom: 16px;
-  }
+  .team { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 60px; animation: fadeUp 0.8s 0.1s ease both; }
+  @media (max-width: 600px) { .team, .scripting-grid { grid-template-columns: 1fr; } }
 
-  .tagline {
-    color: var(--muted);
-    font-size: 15px;
-    font-weight: 300;
-    letter-spacing: 0.5px;
-  }
+  .member-card { background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 24px; backdrop-filter: blur(20px); transition: border-color 0.3s, transform 0.3s; position: relative; overflow: hidden; }
+  .member-card::before { content: ''; position: absolute; inset: 0; background: linear-gradient(135deg, rgba(91,141,238,0.05) 0%, transparent 60%); pointer-events: none; }
+  .member-card:hover { border-color: rgba(91,141,238,0.35); transform: translateY(-2px); }
+  .member-avatar { width: 48px; height: 48px; border-radius: 12px; background: linear-gradient(135deg, var(--blue-mid), var(--purple)); display: flex; align-items: center; justify-content: center; font-family: 'Syne', sans-serif; font-weight: 800; font-size: 18px; margin-bottom: 14px; color: white; }
+  .member-name { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 18px; margin-bottom: 4px; }
+  .member-role { color: var(--accent); font-size: 12px; font-weight: 500; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 14px; }
+  .member-bio { color: var(--muted); font-size: 13px; line-height: 1.6; margin-bottom: 16px; }
+  .discord-link { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; color: var(--muted); text-decoration: none; padding: 6px 12px; border: 1px solid var(--border); border-radius: 100px; transition: all 0.2s; }
+  .discord-link:hover { color: var(--accent); border-color: var(--accent); }
 
-  /* Divider */
-  .section-label {
-    font-family: 'Syne', sans-serif;
-    font-size: 11px;
-    font-weight: 700;
-    letter-spacing: 4px;
-    text-transform: uppercase;
-    color: var(--muted);
-    margin-bottom: 24px;
-    display: flex;
-    align-items: center;
-    gap: 12px;
-  }
-
-  .section-label::after {
-    content: '';
-    flex: 1;
-    height: 1px;
-    background: var(--border);
-  }
-
-  /* Team section */
-  .team {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 16px;
-    margin-bottom: 60px;
-    animation: fadeUp 0.8s 0.1s ease both;
-  }
-
-  @media (max-width: 600px) {
-    .team { grid-template-columns: 1fr; }
-  }
-
-  .member-card {
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: 16px;
-    padding: 24px;
-    backdrop-filter: blur(20px);
-    transition: border-color 0.3s, transform 0.3s;
-    position: relative;
-    overflow: hidden;
-  }
-
-  .member-card::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(135deg, rgba(91,141,238,0.05) 0%, transparent 60%);
-    pointer-events: none;
-  }
-
-  .member-card:hover {
-    border-color: rgba(91,141,238,0.35);
-    transform: translateY(-2px);
-  }
-
-  .member-avatar {
-    width: 48px;
-    height: 48px;
-    border-radius: 12px;
-    background: linear-gradient(135deg, var(--blue-mid), var(--purple));
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-family: 'Syne', sans-serif;
-    font-weight: 800;
-    font-size: 18px;
-    margin-bottom: 14px;
-    color: white;
-  }
-
-  .member-name {
-    font-family: 'Syne', sans-serif;
-    font-weight: 700;
-    font-size: 18px;
-    margin-bottom: 4px;
-  }
-
-  .member-role {
-    color: var(--accent);
-    font-size: 12px;
-    font-weight: 500;
-    letter-spacing: 1px;
-    text-transform: uppercase;
-    margin-bottom: 14px;
-  }
-
-  .member-bio {
-    color: var(--muted);
-    font-size: 13px;
-    line-height: 1.6;
-    margin-bottom: 16px;
-  }
-
-  .discord-link {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    font-size: 12px;
-    color: var(--muted);
-    text-decoration: none;
-    padding: 6px 12px;
-    border: 1px solid var(--border);
-    border-radius: 100px;
-    transition: all 0.2s;
-  }
-
-  .discord-link:hover {
-    color: var(--accent);
-    border-color: var(--accent);
-  }
-
-  /* Projects */
-  .projects {
-    animation: fadeUp 0.8s 0.2s ease both;
-  }
-
-  .project-card {
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: 16px;
-    overflow: hidden;
-    backdrop-filter: blur(20px);
-    margin-bottom: 20px;
-    transition: border-color 0.3s, transform 0.3s;
-  }
-
-  .project-card:hover {
-    border-color: rgba(91,141,238,0.35);
-    transform: translateY(-2px);
-  }
-
-  .project-header {
-    padding: 20px 24px 16px;
-    display: flex;
-    align-items: flex-start;
-    justify-content: space-between;
-    gap: 16px;
-  }
-
-  .project-title {
-    font-family: 'Syne', sans-serif;
-    font-weight: 700;
-    font-size: 17px;
-    margin-bottom: 6px;
-  }
-
-  .project-desc {
-    color: var(--muted);
-    font-size: 13px;
-    line-height: 1.6;
-  }
-
-  .project-tag {
-    font-size: 11px;
-    font-weight: 500;
-    letter-spacing: 1px;
-    text-transform: uppercase;
-    color: var(--accent);
-    background: rgba(91,141,238,0.1);
-    border: 1px solid rgba(91,141,238,0.2);
-    padding: 4px 10px;
-    border-radius: 100px;
-    white-space: nowrap;
-  }
-
-  .video-wrapper {
-    position: relative;
-    width: 100%;
-    padding-bottom: 56.25%;
-    background: #020810;
-  }
-
-  .video-wrapper iframe {
-    position: absolute;
-    inset: 0;
-    width: 100%;
-    height: 100%;
-    border: none;
-  }
-
-  /* Footer */
-  footer {
-    text-align: center;
-    margin-top: 60px;
-    color: var(--muted);
-    font-size: 12px;
-    animation: fadeUp 0.8s 0.3s ease both;
-  }
-
-  /* Scripting grid */
-  .scripting-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 16px;
-    animation: fadeUp 0.8s 0.2s ease both;
-  }
-  @media (max-width: 600px) { .scripting-grid { grid-template-columns: 1fr; } }
-
-  .script-card {
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: 16px;
-    padding: 20px;
-    backdrop-filter: blur(20px);
-    transition: border-color 0.3s, transform 0.3s;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-  }
+  .scripting-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 50px; animation: fadeUp 0.8s 0.2s ease both; }
+  .script-card { background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 20px; backdrop-filter: blur(20px); transition: border-color 0.3s, transform 0.3s; display: flex; flex-direction: column; gap: 10px; }
   .script-card:hover { border-color: rgba(91,141,238,0.35); transform: translateY(-2px); }
-
   .script-card-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; }
   .script-card-title { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 15px; }
   .script-card-desc { color: var(--muted); font-size: 12px; line-height: 1.6; flex: 1; }
 
-  .watch-btn {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    font-size: 12px;
-    font-weight: 500;
-    color: var(--accent);
-    background: rgba(91,141,238,0.1);
-    border: 1px solid rgba(91,141,238,0.25);
-    padding: 7px 14px;
-    border-radius: 100px;
-    cursor: pointer;
-    transition: all 0.2s;
-    width: fit-content;
-    text-decoration: none;
-  }
+  .project-tag { font-size: 11px; font-weight: 500; letter-spacing: 1px; text-transform: uppercase; color: var(--accent); background: rgba(91,141,238,0.1); border: 1px solid rgba(91,141,238,0.2); padding: 4px 10px; border-radius: 100px; white-space: nowrap; }
+
+  .watch-btn { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 500; color: var(--accent); background: rgba(91,141,238,0.1); border: 1px solid rgba(91,141,238,0.25); padding: 7px 14px; border-radius: 100px; cursor: pointer; transition: all 0.2s; width: fit-content; }
   .watch-btn:hover { background: rgba(91,141,238,0.2); border-color: var(--accent); }
 
-  .accordion-header {
-    padding: 20px 24px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    cursor: pointer;
-    user-select: none;
-    gap: 16px;
-  }
+  .projects { animation: fadeUp 0.8s 0.2s ease both; }
+  .project-card { background: var(--card); border: 1px solid var(--border); border-radius: 16px; overflow: hidden; backdrop-filter: blur(20px); margin-bottom: 20px; transition: border-color 0.3s, transform 0.3s; }
+  .project-card:hover { border-color: rgba(91,141,238,0.35); transform: translateY(-2px); }
+
+  .accordion-header { padding: 20px 24px; display: flex; align-items: center; justify-content: space-between; cursor: pointer; user-select: none; gap: 16px; }
   .accordion-header:hover .accordion-title { color: var(--accent); }
   .accordion-title { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 17px; transition: color 0.2s; }
   .accordion-arrow { color: var(--muted); font-size: 18px; transition: transform 0.3s; }
@@ -355,24 +83,19 @@
   .accordion-body.open { display: block; }
   .accordion-desc { color: var(--muted); font-size: 13px; line-height: 1.6; padding: 0 24px 16px; }
 
-  /* Gallery */
   .gallery-img { cursor: zoom-in; transition: opacity 0.2s; }
   .gallery-img:hover { opacity: 0.85; }
+
   .modal { display: none; position: fixed; inset: 0; z-index: 999; background: rgba(4,13,26,0.75); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); align-items: center; justify-content: center; }
   .modal.active { display: flex; }
   .modal-close { position: fixed; top: 20px; right: 24px; color: white; font-size: 28px; cursor: pointer; opacity: 0.7; z-index: 1000; }
   .modal-close:hover { opacity: 1; }
   .modal-video { width: 90vw; max-width: 900px; aspect-ratio: 16/9; border-radius: 12px; overflow: hidden; }
   .modal-video iframe { width: 100%; height: 100%; border: none; }
-  .modal-img img { max-width: 90vw; max-height: 90vh; object-fit: contain; border-radius: 8px; cursor: default; }
+  .modal-img img { max-width: 90vw; max-height: 90vh; object-fit: contain; border-radius: 8px; }
 
-  /* Animations */
-  @keyframes fadeUp {
-    from { opacity: 0; transform: translateY(20px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
-
-
+  footer { text-align: center; margin-top: 60px; color: var(--muted); font-size: 12px; animation: fadeUp 0.8s 0.3s ease both; }
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 </style>
 </head>
 <body>
@@ -400,7 +123,6 @@
         tmatthew_vreal
       </a>
     </div>
-
     <div class="member-card">
       <div class="member-avatar" style="background: linear-gradient(135deg, #6b2fa0, #a855f7);">A</div>
       <div class="member-name">Alejo_bbo</div>
@@ -415,6 +137,7 @@
 
   <div class="section-label">Scripting Projects</div>
   <div class="scripting-grid">
+
     <div class="script-card">
       <div class="script-card-top">
         <div class="script-card-title">Round System</div>
@@ -423,17 +146,28 @@
       <div class="script-card-desc">Multiplayer round system with lobby countdown, round timer and intermission loop. Real-time server-client sync via RemoteEvents.</div>
       <button class="watch-btn" onclick="openVideo('https://streamable.com/e/sc5u0v')">▶ Watch Demo</button>
     </div>
+
     <div class="script-card">
       <div class="script-card-top">
         <div class="script-card-title">DataStore System</div>
         <div class="project-tag">Scripting</div>
       </div>
-      <div class="script-card-desc">On join the script pulls saved data, if none is found it initializes with Money 100 and Level 1, then fires the stats to the client immediately. Loops: +10 Money every 5s and +1 Level every 10s for testing. Autosave every 60s, PlayerRemoving on disconnect, BindToClose covers unexpected shutdowns. Client listens for server events and updates the display. No polling, just event-driven.</div>
+      <div class="script-card-desc">On join the script pulls saved data, if none is found it initializes with Money 100 and Level 1, then fires the stats to the client immediately. Autosave every 60s, PlayerRemoving on disconnect, BindToClose covers unexpected shutdowns. No polling, just event-driven.</div>
       <button class="watch-btn" onclick="openVideo('https://streamable.com/e/3fu2zj')">▶ Watch Demo</button>
     </div>
+
+    <div class="script-card">
+      <div class="script-card-top">
+        <div class="script-card-title">Crafting System (Combinations)</div>
+        <div class="project-tag">Scripting</div>
+      </div>
+      <div class="script-card-desc">You collect items, deposit them at an ATM and the system crafts a weapon based on your combination.</div>
+      <button class="watch-btn" onclick="openVideo('https://streamable.com/e/zf0219')">▶ Watch Demo</button>
+    </div>
+
   </div>
 
-  <div class="section-label" style="margin-top:50px;">Building Projects</div>
+  <div class="section-label">Building Projects</div>
   <div class="projects">
     <div class="project-card">
       <div class="accordion-header" onclick="toggleAccordion('supermarket')">
@@ -453,12 +187,11 @@
           <img class="gallery-img" onclick="openImg(this.src)" src="https://cdn.discordapp.com/attachments/1243382692356292658/1492569027288236185/sasda_1.png?ex=69dbceba&is=69da7d3a&hm=41bd9d7c1243f3f61a295ff672f65fbfd164f299b2bbe805892884d3ab146273" style="width:100%;aspect-ratio:16/9;object-fit:cover;" />
           <img class="gallery-img" onclick="openImg(this.src)" src="https://cdn.discordapp.com/attachments/1243382692356292658/1492631857500524714/image.png?ex=69dc093e&is=69dab7be&hm=46e0494f0e4dd38f7c27627b16425835a1513e6ed9ac0f0a0b0e4a0fa8064af9" style="width:100%;aspect-ratio:16/9;object-fit:cover;" />
         </div>
+      </div>
     </div>
   </div>
 
-  <footer>
-    MAVT Studio · Roblox Development
-  </footer>
+  <footer>MAVT Studio · Roblox Development</footer>
 
 </div>
 
@@ -478,10 +211,8 @@
 
 <script>
   function toggleAccordion(id) {
-    const body = document.getElementById(id);
-    const arrow = document.getElementById(id + '-arrow');
-    body.classList.toggle('open');
-    arrow.classList.toggle('open');
+    document.getElementById(id).classList.toggle('open');
+    document.getElementById(id + '-arrow').classList.toggle('open');
   }
   function openVideo(src) {
     document.getElementById('videoFrame').src = src;
@@ -496,10 +227,7 @@
     if (id === 'videoModal') document.getElementById('videoFrame').src = '';
   }
   document.addEventListener('keydown', function(e) {
-    if (e.key === 'Escape') {
-      closeModal('videoModal');
-      closeModal('imgModal');
-    }
+    if (e.key === 'Escape') { closeModal('videoModal'); closeModal('imgModal'); }
   });
 </script>
 
