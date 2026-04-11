@@ -421,9 +421,15 @@
         <div class="project-tag">Scripting</div>
       </div>
       <div class="script-card-desc">Multiplayer round system with lobby countdown, round timer and intermission loop. Real-time server-client sync via RemoteEvents.</div>
-      <button class="watch-btn" onclick="openVideo('https://streamable.com/e/sc5u0v')">
-        ▶ Watch Demo
-      </button>
+      <button class="watch-btn" onclick="openVideo('https://streamable.com/e/sc5u0v')">▶ Watch Demo</button>
+    </div>
+    <div class="script-card">
+      <div class="script-card-top">
+        <div class="script-card-title">DataStore System</div>
+        <div class="project-tag">Scripting</div>
+      </div>
+      <div class="script-card-desc">On join the script pulls saved data, if none is found it initializes with Money 100 and Level 1, then fires the stats to the client immediately. Loops: +10 Money every 5s and +1 Level every 10s for testing. Autosave every 60s, PlayerRemoving on disconnect, BindToClose covers unexpected shutdowns. Client listens for server events and updates the display. No polling, just event-driven.</div>
+      <button class="watch-btn" onclick="openVideo('https://streamable.com/e/3fu2zj')">▶ Watch Demo</button>
     </div>
   </div>
 
