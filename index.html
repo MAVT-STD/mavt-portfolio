@@ -294,19 +294,70 @@
     animation: fadeUp 0.8s 0.3s ease both;
   }
 
+  /* Scripting grid */
+  .scripting-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    animation: fadeUp 0.8s 0.2s ease both;
+  }
+  @media (max-width: 600px) { .scripting-grid { grid-template-columns: 1fr; } }
+
+  .script-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 20px;
+    backdrop-filter: blur(20px);
+    transition: border-color 0.3s, transform 0.3s;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .script-card:hover { border-color: rgba(91,141,238,0.35); transform: translateY(-2px); }
+
+  .script-card-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; }
+  .script-card-title { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 15px; }
+  .script-card-desc { color: var(--muted); font-size: 12px; line-height: 1.6; flex: 1; }
+
+  .watch-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--accent);
+    background: rgba(91,141,238,0.1);
+    border: 1px solid rgba(91,141,238,0.25);
+    padding: 7px 14px;
+    border-radius: 100px;
+    cursor: pointer;
+    transition: all 0.2s;
+    width: fit-content;
+    text-decoration: none;
+  }
+  .watch-btn:hover { background: rgba(91,141,238,0.2); border-color: var(--accent); }
+
+  /* Gallery */
+  .gallery-img { cursor: zoom-in; transition: opacity 0.2s; }
+  .gallery-img:hover { opacity: 0.85; }
+
+  /* Modal */
+  .modal { display: none; position: fixed; inset: 0; z-index: 999; background: rgba(0,0,0,0.92); align-items: center; justify-content: center; }
+  .modal.active { display: flex; }
+  .modal-close { position: fixed; top: 20px; right: 24px; color: white; font-size: 28px; cursor: pointer; opacity: 0.7; z-index: 1000; }
+  .modal-close:hover { opacity: 1; }
+  .modal-video { width: 90vw; max-width: 900px; aspect-ratio: 16/9; border-radius: 12px; overflow: hidden; }
+  .modal-video iframe { width: 100%; height: 100%; border: none; }
+  .modal-img img { max-width: 90vw; max-height: 90vh; object-fit: contain; border-radius: 8px; cursor: default; }
+
   /* Animations */
   @keyframes fadeUp {
     from { opacity: 0; transform: translateY(20px); }
     to { opacity: 1; transform: translateY(0); }
   }
 
-  .gallery-img { cursor: zoom-in; transition: opacity 0.2s; }
-  .gallery-img:hover { opacity: 0.85; }
-  .lightbox { display: none; position: fixed; inset: 0; z-index: 999; background: rgba(0,0,0,0.92); align-items: center; justify-content: center; cursor: zoom-out; }
-  .lightbox.active { display: flex; }
-  .lightbox img { max-width: 90vw; max-height: 90vh; object-fit: contain; border-radius: 8px; }
-  .lightbox-close { position: fixed; top: 20px; right: 24px; color: white; font-size: 28px; cursor: pointer; opacity: 0.7; }
-  .lightbox-close:hover { opacity: 1; }
+
 </style>
 </head>
 <body>
@@ -348,18 +399,16 @@
   </div>
 
   <div class="section-label">Scripting Projects</div>
-  <div class="projects">
-    <div class="project-card">
-      <div class="project-header">
-        <div>
-          <div class="project-title">Round System</div>
-          <div class="project-desc">A complete multiplayer round system with lobby countdown, round timer and intermission loop. Built with RemoteEvents for real-time server-client communication.</div>
-        </div>
+  <div class="scripting-grid">
+    <div class="script-card">
+      <div class="script-card-top">
+        <div class="script-card-title">Round System</div>
         <div class="project-tag">Scripting</div>
       </div>
-      <div class="video-wrapper">
-        <iframe src="https://streamable.com/e/sc5u0v" allowfullscreen></iframe>
-      </div>
+      <div class="script-card-desc">Multiplayer round system with lobby countdown, round timer and intermission loop. Real-time server-client sync via RemoteEvents.</div>
+      <button class="watch-btn" onclick="openVideo('https://streamable.com/e/sc5u0v')">
+        ▶ Watch Demo
+      </button>
     </div>
   </div>
 
@@ -374,10 +423,10 @@
         <div class="project-tag">Building</div>
       </div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:3px;">
-        <img class="gallery-img" onclick="openLightbox(this.src)" src="https://cdn.discordapp.com/attachments/1243382692356292658/1492559709952278580/image.png?ex=69dbc60d&is=69da748d&hm=45ce944028174c3b78dbf04eb8c2dc696749790a6c435150703a7cdd4bcd9dde" style="width:100%;aspect-ratio:16/9;object-fit:cover;" />
-        <img class="gallery-img" onclick="openLightbox(this.src)" src="https://cdn.discordapp.com/attachments/1243382692356292658/1492559536458957011/asasdas.png?ex=69dbc5e3&is=69da7463&hm=7066961746481aa6cefec81f6264ea29ae634fd9b091df56a5f5f6e8a16837fa" style="width:100%;aspect-ratio:16/9;object-fit:cover;" />
-        <img class="gallery-img" onclick="openLightbox(this.src)" src="https://cdn.discordapp.com/attachments/1243382692356292658/1492559516678488104/sadasdas.png?ex=69dbc5df&is=69da745f&hm=0805dcbffcfbaf5f0342c6af45f63fb5c7b403e66c523c4038342007905cbef2" style="width:100%;aspect-ratio:16/9;object-fit:cover;" />
-        <img class="gallery-img" onclick="openLightbox(this.src)" src="https://cdn.discordapp.com/attachments/1243382692356292658/1492560317446619146/image.png?ex=69dbc69e&is=69da751e&hm=937bf32796a86ca5a579f652fcdcec6e6cabac07586e2dcc1554e11585762933" style="width:100%;aspect-ratio:16/9;object-fit:cover;" />
+        <img class="gallery-img" onclick="openImg(this.src)" src="https://cdn.discordapp.com/attachments/1243382692356292658/1492559709952278580/image.png?ex=69dbc60d&is=69da748d&hm=45ce944028174c3b78dbf04eb8c2dc696749790a6c435150703a7cdd4bcd9dde" style="width:100%;aspect-ratio:16/9;object-fit:cover;" />
+        <img class="gallery-img" onclick="openImg(this.src)" src="https://cdn.discordapp.com/attachments/1243382692356292658/1492559536458957011/asasdas.png?ex=69dbc5e3&is=69da7463&hm=7066961746481aa6cefec81f6264ea29ae634fd9b091df56a5f5f6e8a16837fa" style="width:100%;aspect-ratio:16/9;object-fit:cover;" />
+        <img class="gallery-img" onclick="openImg(this.src)" src="https://cdn.discordapp.com/attachments/1243382692356292658/1492559516678488104/sadasdas.png?ex=69dbc5df&is=69da745f&hm=0805dcbffcfbaf5f0342c6af45f63fb5c7b403e66c523c4038342007905cbef2" style="width:100%;aspect-ratio:16/9;object-fit:cover;" />
+        <img class="gallery-img" onclick="openImg(this.src)" src="https://cdn.discordapp.com/attachments/1243382692356292658/1492560317446619146/image.png?ex=69dbc69e&is=69da751e&hm=937bf32796a86ca5a579f652fcdcec6e6cabac07586e2dcc1554e11585762933" style="width:100%;aspect-ratio:16/9;object-fit:cover;" />
       </div>
     </div>
   </div>
@@ -388,21 +437,38 @@
 
 </div>
 
-<div class="lightbox" id="lightbox" onclick="closeLightbox()">
-  <span class="lightbox-close" onclick="closeLightbox()">✕</span>
-  <img id="lightbox-img" src="" />
+<div class="modal" id="videoModal" onclick="closeModal('videoModal')">
+  <span class="modal-close" onclick="closeModal('videoModal')">✕</span>
+  <div class="modal-video" onclick="event.stopPropagation()">
+    <iframe id="videoFrame" src="" allowfullscreen></iframe>
+  </div>
+</div>
+
+<div class="modal" id="imgModal" onclick="closeModal('imgModal')">
+  <span class="modal-close" onclick="closeModal('imgModal')">✕</span>
+  <div class="modal-img">
+    <img id="modalImg" src="" />
+  </div>
 </div>
 
 <script>
-  function openLightbox(src) {
-    document.getElementById('lightbox-img').src = src;
-    document.getElementById('lightbox').classList.add('active');
+  function openVideo(src) {
+    document.getElementById('videoFrame').src = src;
+    document.getElementById('videoModal').classList.add('active');
   }
-  function closeLightbox() {
-    document.getElementById('lightbox').classList.remove('active');
+  function openImg(src) {
+    document.getElementById('modalImg').src = src;
+    document.getElementById('imgModal').classList.add('active');
+  }
+  function closeModal(id) {
+    document.getElementById(id).classList.remove('active');
+    if (id === 'videoModal') document.getElementById('videoFrame').src = '';
   }
   document.addEventListener('keydown', function(e) {
-    if (e.key === 'Escape') closeLightbox();
+    if (e.key === 'Escape') {
+      closeModal('videoModal');
+      closeModal('imgModal');
+    }
   });
 </script>
 
