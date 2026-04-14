@@ -1,274 +1,282 @@
--- rebirths v2 
+-- REBIRTH SYSTEM - Maatzzs
+-- v2 final (dont touch remotes or the gui breaks)
 
-local p = game:GetService("Players")
-local rs = game:GetService("ReplicatedStorage")
-local rem = rs:WaitForChild("Remotes")
-local grs = rem:WaitForChild("GetRebirthState")
-local rr = rem:WaitForChild("RequestRebirth")
+local Players = game:GetService("Players")
+local RS = game:GetService("ReplicatedStorage")
+local DS = game:GetService("DataStoreService")
 
-busy = {}
-local lastreb = {}
-local COOLDOWN = 3
+local rbStore = DS:GetDataStore("PlayerRebirths_FINAL")
 
-local cfg = {
+local rems = RS:FindFirstChild("Remotes")
+local getState = rems:WaitForChild("GetRebirthState")
+local doRebirth = rems:WaitForChild("RequestRebirth")
+
+local active_db = {}
+local cd_table = {}
+local COOLDOWN = 5
+
+local TIERS = {
 	[1] = {
-		money = 5e6,
-		level = nil,
-		brs = {"Tung Tung Tung Sahur","Tralalero Tralala","Ballerina Cappuccina"},
-		unlocks = {
-			{kind="Unlock", text="Gravity Coil",     icon="rbxassetid://132650611644555"},
-			{kind="Slot",   text="+1 Brainrot Slot", icon="rbxassetid://124379522962993"},
-			{kind="XP",     text="2x XP",            icon="rbxassetid://120851766834871"},
-		},
-		multi = {"XP_x2"},
+		price = 5000000,
+		level = 1,
+		items = {"Tung Tung Tung Sahur", "Tralalero Tralala", "Ballerina Cappuccina"},
+		slots = 1,
 		bonus = 0,
+		id = "132650611644555",
+		mults = {{"XP_x2", 1}}
 	},
 	[2] = {
-		money = 1e7,
+		price = 10000000,
 		level = 5,
-		brs = {"Trippi Troppi","Boneca Ambalabu","Chimpanzini Bananini","Capuccino Assassino"},
-		unlocks = {
-			{kind="Unlock", text="Grapple Hook",     icon="rbxassetid://94074799999195"},
-			{kind="Slot",   text="+1 Brainrot Slot", icon="rbxassetid://124379522962993"},
-			{kind="Money",  text="2x Money",         icon="rbxassetid://75587499543184"},
-		},
-		multi = {"Money_x2"},
+		items = {"Trippi Troppi", "Boneca Ambalabu", "Chimpanzini Bananini", "Capuccino Assassino"},
+		slots = 1,
 		bonus = 0,
+		id = "94074799999195",
+		mults = {{"Money_x2", 1}}
 	},
 	[3] = {
-		money = 5e7,
+		price = 50000000,
 		level = 10,
-		brs = {"Gangster Footera","Cacto Hipopotamo","Odin din din dun"},
-		unlocks = {
-			{kind="Unlock", text="Body Swap",         icon="rbxassetid://133574454346071"},
-			{kind="Unlock", text="Invisibility Cape", icon="rbxassetid://135912146858108"},
-			{kind="Slot",   text="+1 Brainrot Slot",  icon="rbxassetid://124379522962993"},
-			{kind="Bonus",  text="+$500k Bonus",      icon="rbxassetid://106164878268674"},
-		},
-		multi = {},
-		bonus = 5e5,
+		items = {"Gangster Footera", "Cacto Hipopotamo", "Odin din din dun"},
+		slots = 1,
+		bonus = 500000,
+		id = "133574454346071"
 	},
 	[4] = {
-		money = 15e7,
+		price = 150000000,
 		level = 15,
-		brs = {"Ta Ta Ta Sahur","Frigo Camelo","To To To Sahur","Bombardiro Crocodilo"},
-		unlocks = {
-			{kind="Unlock", text="Jetpack",     icon="rbxassetid://113554686033472"},
-			{kind="XP",     text="2x XP",      icon="rbxassetid://120851766834871"},
-			{kind="Money",  text="2x Money",   icon="rbxassetid://75587499543184"},
-			{kind="Bonus",  text="+$2M Bonus", icon="rbxassetid://106164878268674"},
-		},
-		multi = {"Money_x2","XP_x2"},
-		bonus = 2e6,
+		items = {"Ta Ta Ta Sahur", "Frigo Camelo", "To To To Sahur", "Bombardiro Crocodilo"},
+		slots = 0,
+		bonus = 2000000,
+		id = "113554686033472",
+		mults = {{"Money_x2", 1}, {"XP_x2", 1}}
 	},
+	[5] = {
+		price = 500000000,
+		level = 25,
+		items = {"Mega Sahur", "Super Frigo", "Ultra Bombardiro"},
+		slots = 2,
+		bonus = 5000000,
+		id = "142650611644001"
+	},
+	[6] = {
+		price = 1000000000,
+		level = 40,
+		items = {"Giga Brainrot", "Final Sahur"},
+		slots = 0,
+		bonus = 10000000,
+		id = "133574454346006"
+	},
+	[7] = {
+		price = 5000000000,
+		level = 60,
+		items = {"Mythic Sahur", "Eternal Frigo"},
+		slots = 2,
+		bonus = 25000000,
+		id = "124379522962993"
+	},
+	[8] = {
+		price = 25000000000,
+		level = 80,
+		items = {"Void Sahur", "Cosmic Frigo"},
+		slots = 0,
+		bonus = 100000000,
+		id = "113554686033008"
+	},
+	[9] = {
+		price = 100000000000,
+		level = 100,
+		items = {"Divine Sahur", "Omega Frigo"},
+		slots = 5,
+		bonus = 500000000,
+		id = "135912146858009"
+	},
+	[10] = {
+		price = 1000000000000,
+		level = 150,
+		items = {"Absolute Sahur"},
+		slots = 0,
+		bonus = 1000000000,
+		id = "152650611644010"
+	}
 }
 
-local function getbrf(plr)
-	local f = plr:FindFirstChild("OwnedBrainrots")
+local function getInv(p)
+	local f = p:FindFirstChild("OwnedBrainrots")
 	if not f then
-		f = Instance.new("Folder")
+		print(p.Name.." missing OwnedBrainrots, creating")
+		f = Instance.new("Folder", p)
 		f.Name = "OwnedBrainrots"
-		f.Parent = plr
 	end
 	return f
 end
 
-local function hasbr(plr, name)
-	local f = plr:FindFirstChild("OwnedBrainrots")
-	if not f then
-		print(plr.Name.." has no OwnedBrainrots folder??")
+local function hasItem(p, name)
+	local inv = getInv(p)
+	local v = inv:FindFirstChild(name)
+	if not v then return false end
+	if not v:IsA("BoolValue") then
+		print(name.." wrong type: "..v.ClassName)
 		return false
 	end
-	local b = f:FindFirstChild(name)
-	if not b then return false end
-	if not b:IsA("BoolValue") then
-		print(name.." isnt a BoolValue wtf")
-		return false
+	return v.Value == true
+end
+
+local function onCooldown(p)
+	local last = cd_table[p]
+	if not last then return false end
+	return tick() - last < COOLDOWN
+end
+
+local function saveData(p)
+	if not p or not p.Parent then return end
+	local data = {
+		rb    = p:GetAttribute("Rebirth") or 0,
+		slots = p:GetAttribute("InventoryMaxSlots") or 10
+	}
+	local ok, err = pcall(function()
+		rbStore:SetAsync(tostring(p.UserId), data)
+	end)
+	if not ok then
+		print("save failed for "..p.Name..": "..tostring(err))
 	end
-	return b.Value == true
 end
 
-local function getm(plr) return plr:GetAttribute("Money") or 0 end
-local function getlv(plr) return plr:GetAttribute("Level") or 1 end
-local function getrb(plr) return plr:GetAttribute("Rebirth") or 0 end
-local function getsl(plr) return plr:GetAttribute("InventoryMaxSlots") or 10 end
+local function setupPlr(p)
+	local ok, saved = pcall(function() return rbStore:GetAsync(tostring(p.UserId)) end)
 
-local function setupplr(plr)
-	wait(1) -- breaks without this sometimes 
-	if plr:GetAttribute("Money") == nil then plr:SetAttribute("Money", 0) end
-	if plr:GetAttribute("Level") == nil then plr:SetAttribute("Level", 1) end
-	if plr:GetAttribute("Rebirth") == nil then plr:SetAttribute("Rebirth", 0) end
-	if plr:GetAttribute("InventoryMaxSlots") == nil then plr:SetAttribute("InventoryMaxSlots", 10) end
-	if plr:GetAttribute("TotalRebirths") == nil then plr:SetAttribute("TotalRebirths", 0) end
-	getbrf(plr)
-	lastreb[plr] = 0
-	busy[plr] = false
-	print(plr.Name.." setup done")
+	p:SetAttribute("Rebirth", (ok and saved and saved.rb) or 0)
+	p:SetAttribute("InventoryMaxSlots", (ok and saved and saved.slots) or 10)
+
+	if not p:GetAttribute("Money") then p:SetAttribute("Money", 0) end
+	if not p:GetAttribute("Level") then p:SetAttribute("Level", 1) end
+	if not p:GetAttribute("TotalRebirths") then p:SetAttribute("TotalRebirths", 0) end
+
+	getInv(p)
+	cd_table[p] = 0
+	print(p.Name.." loaded rb="..tostring(p:GetAttribute("Rebirth")))
 end
 
-local function oncd(plr)
-	local last = lastreb[plr] or 0
-	if tick() - last < COOLDOWN then return true end
-	return false
-end
+getState.OnServerInvoke = function(p)
+	local cur = p:GetAttribute("Rebirth") or 0
+	local nxt = cur + 1
+	local data = TIERS[nxt]
 
-local function canreb(plr)
-	local rb = getrb(plr)
-	if rb >= 4 then return false end
-	local d = cfg[rb+1]
-	if not d then return false end
-	local m = getm(plr)
-	if m < d.money then return false end
-	if m ~= m then return false end 
-	if d.level and getlv(plr) < d.level then return false end
-	for _,v in pairs(d.brs) do
-		if not hasbr(plr,v) then return false end
-	end
-	return true
-end
+	if not data then return {maxed = true, rebirth = cur} end
 
-local function buildstate(plr)
-	local rb = getrb(plr)
-	if rb >= 4 then
-		return {maxed=true, rebirth=rb, money=getm(plr), level=getlv(plr)}
-	end
-	local d = cfg[rb+1]
-	if not d then return {maxed=true, rebirth=rb} end
+	local money = p:GetAttribute("Money") or 0
+	local lvl   = p:GetAttribute("Level") or 1
 	local owned = {}
-	for _,v in pairs(d.brs) do
-		owned[v] = hasbr(plr,v)
+	local can   = true
+
+	for _, name in pairs(data.items) do
+		local has = hasItem(p, name)
+		owned[name] = has
+		if not has then can = false end
 	end
+
+	if money < data.price then can = false end
+	if lvl < data.level then can = false end
+
 	return {
-		maxed   = false,
-		rebirth = rb,
-		next    = rb+1,
-		req     = {money=d.money, level=d.level, brs=d.brs},
-		owned   = owned,
-		unlocks = d.unlocks,
-		money   = getm(plr),
-		level   = getlv(plr),
-		can     = canreb(plr),
+		maxed      = false,
+		rebirth    = cur,
+		cost       = data.price,
+		reqLvl     = data.level,
+		reqItems   = data.items,
+		ownedItems = owned,
+		canRb      = can,
+		money      = money,
+		level      = lvl,
 	}
 end
 
-local function dounlocks(plr, rb)
-	local d = cfg[rb]
-	if not d then
-		print("no cfg for rb "..rb.." ??")
-		return
+doRebirth.OnServerInvoke = function(p)
+	if active_db[p] then
+		print(p.Name.." already busy")
+		return false, "busy"
 	end
-	local slots = getsl(plr)
-	local gotbonus = false
-	for _,u in pairs(d.unlocks) do
-		if u.kind == "Slot" then
-			slots += 1
-			print(plr.Name.." got +1 slot -> "..slots)
-		elseif u.kind == "Bonus" and not gotbonus then
-			if d.bonus > 0 then
-				local cur = getm(plr)
-				plr:SetAttribute("Money", cur + d.bonus)
-				print(plr.Name.." got bonus $"..d.bonus.." total: "..(cur+d.bonus))
-				gotbonus = true
-			end
-		elseif u.kind == "Unlock" then
-			print(plr.Name.." unlocked: "..u.text)
-		elseif u.kind == "XP" then
-			print(plr.Name.." got xp boost: "..u.text)
-		elseif u.kind == "Money" then
-			print(plr.Name.." got money boost: "..u.text)
+
+	if onCooldown(p) then
+		print(p.Name.." on cooldown")
+		return false, "cooldown"
+	end
+
+	local rb   = p:GetAttribute("Rebirth") or 0
+	local nxt  = rb + 1
+	local data = TIERS[nxt]
+
+	if not data then return false, "max" end
+
+	local money = p:GetAttribute("Money") or 0
+	local lvl   = p:GetAttribute("Level") or 1
+
+	if money < data.price then
+		print(p.Name.." not enough money "..money.."/"..data.price)
+		return false, "reqs"
+	end
+	if lvl < data.level then
+		print(p.Name.." not enough level "..lvl.."/"..data.level)
+		return false, "reqs"
+	end
+
+	for _, item in pairs(data.items) do
+		if not hasItem(p, item) then
+			print(p.Name.." missing item: "..item)
+			return false, "items"
 		end
 	end
-	plr:SetAttribute("InventoryMaxSlots", slots)
-end
 
-local function domulti(plr, rb)
-	local d = cfg[rb]
-	if not d or #d.multi == 0 then return end
-	local gm = rem:FindFirstChild("GiveMultiplier")
-	if not gm then
-		print("GiveMultiplier not found")
-		return
+	active_db[p] = true
+
+	p:SetAttribute("Rebirth", nxt)
+	p:SetAttribute("Money", data.bonus)
+	p:SetAttribute("TotalRebirths", (p:GetAttribute("TotalRebirths") or 0) + 1)
+
+	if data.slots and data.slots > 0 then
+		local cur = p:GetAttribute("InventoryMaxSlots") or 10
+		p:SetAttribute("InventoryMaxSlots", cur + data.slots)
+		print(p.Name.." slots "..cur.." -> "..(cur+data.slots))
 	end
-	for _,k in pairs(d.multi) do
-		local ok = pcall(function()
-			gm:Invoke(plr, k, 1)
-		end)
-		if ok then
-			print(plr.Name.." got multiplier "..k)
+
+	if data.mults then
+		local give = rems:FindFirstChild("GiveMultiplier")
+		if give then
+			for _, m in pairs(data.mults) do
+				local ok = pcall(function() give:Invoke(p, m[1], m[2]) end)
+				if not ok then print("mult failed: "..m[1]) end
+			end
 		else
-			print("multiplier failed for "..k)
+			print("GiveMultiplier not found")
 		end
 	end
+
+	task.wait(0.5)
+	saveData(p)
+
+	cd_table[p] = tick()
+	active_db[p] = nil
+
+	print(p.Name.." rebirth "..rb.." -> "..nxt)
+	return true, "ok"
 end
 
-grs.OnServerInvoke = function(plr)
-	return buildstate(plr)
-end
+Players.PlayerAdded:Connect(setupPlr)
 
-rr.OnServerInvoke = function(plr)
-	if busy[plr] then
-		print(plr.Name.." already in rebirth")
-		return false, "busy", buildstate(plr)
-	end
-
-	if oncd(plr) then
-		print(plr.Name.." on cooldown")
-		return false, "cooldown", buildstate(plr)
-	end
-
-	if not canreb(plr) then
-		local rb = getrb(plr)
-		local d = cfg[rb+1]
-		if d then
-			for _,v in pairs(d.brs) do
-				if not hasbr(plr,v) then
-					print(plr.Name.." missing: "..v)
-				end
-			end
-			if getm(plr) < d.money then
-				print(plr.Name.." broke: "..getm(plr).."/"..d.money)
-			end
-			if d.level and getlv(plr) < d.level then
-				print(plr.Name.." low level: "..getlv(plr).."/"..d.level)
-			end
-		end
-		return false, "reqs", buildstate(plr)
-	end
-
-	busy[plr] = true
-
-	local rb = getrb(plr)
-	local newrb = rb + 1
-
-	plr:SetAttribute("Rebirth", newrb)
-	plr:SetAttribute("Money", 0)
-	plr:SetAttribute("TotalRebirths", (plr:GetAttribute("TotalRebirths") or 0) + 1)
-
-	dounlocks(plr, newrb)
-	domulti(plr, newrb)
-
-	lastreb[plr] = tick()
-	busy[plr] = false
-
-	print(plr.Name.." rebirth "..rb.." -> "..newrb)
-	print("slots: "..getsl(plr).." money: "..getm(plr))
-
-	return true, "ok", {
-		newrb  = newrb,
-		money  = getm(plr),
-		slots  = getsl(plr),
-	}
-end
-
-p.PlayerAdded:Connect(setupplr)
-
-p.PlayerRemoving:Connect(function(plr)
-	busy[plr] = nil
-	lastreb[plr] = nil
+Players.PlayerRemoving:Connect(function(p)
+	saveData(p)
+	active_db[p] = nil
+	cd_table[p] = nil
 end)
 
-for _,v in pairs(p:GetPlayers()) do
-	setupplr(v)
+game:BindToClose(function()
+	for _, p in pairs(Players:GetPlayers()) do
+		saveData(p)
+	end
+end)
+
+for _, p in pairs(Players:GetPlayers()) do
+	task.spawn(setupPlr, p)
 end
 
 print("rebirths loaded")
